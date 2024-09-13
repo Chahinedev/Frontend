@@ -1,32 +1,41 @@
-export default function useFetch() {
-  const callApi = async (method: 'GET' | 'DELETE' | 'POST' | 'PUT' | 'PATCH', route: string, data?: Record<string, any>) => {
-    try {
-      const myHeaders = new Headers();
+const useFetch = () => {
+  const baseUrl = 'http://localhost:3000';  // Changez avec l'URL de votre API si nécessaire
 
-      myHeaders.set('Accept', 'application/json');
-      myHeaders.set('Content-Type', 'application/json');
-
-      const requestOptions = {
-        method,
-        headers: myHeaders,
-        ...(data ? { body:  JSON.stringify(data) } : {}),
-      };
-
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}${route}`, requestOptions);
-
-      return response.json();
-    } catch (error) {
-      console.error(error);
-
-      return false;
-    }
+  const get = async (endpoint: string) => {
+    const response = await fetch(`${baseUrl}${endpoint}`);
+    return response.json();
   };
 
-  return {
-    get: (route: string) => callApi('GET', route),
-    post: (route: string, data: Record<string, any>) => callApi('POST', route, data),
-    put: (route: string, data: Record<string, any>) => callApi('PUT', route, data),
-    patch: (route: string, data: Record<string, any>) => callApi('PATCH', route, data),
-    delete: (route: string, data?: Record<string, any>) => callApi('DELETE', route, data),
-  }
-}
+  const post = async (endpoint: string, body: any) => {
+    const response = await fetch(`${baseUrl}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    return response.json();
+  };
+
+  const put = async (endpoint: string, body: any) => {
+    const response = await fetch(`${baseUrl}${endpoint}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    return response.json();
+  };
+
+  const del = async (endpoint: string) => {
+    const response = await fetch(`${baseUrl}${endpoint}`, {
+      method: 'DELETE',
+    });
+    return response.json();
+  };
+
+  return { get, post, put, delete: del };
+};
+
+export default useFetch;
